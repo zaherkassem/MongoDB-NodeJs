@@ -1,0 +1,49 @@
+{
+  "name": "migration-db",
+  "description": "migration-db",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "10.16.*",
+    "npm": "6.*"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "test": ":"
+  },
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zaherkassem/migrationDB"
+  },
+  "directories": {
+    "client": "client/",
+    "server": "server/"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-core": "^6.26.3",
+    "del": "^4.1.1"
+  },
+  "dependencies": {
+    "assert": "^2.0.0",
+    "async": "^2.6.3",
+    "base64-coder-node": "^1.0.7",
+    "body-parser": "^1.18.3",
+    "compression": "^1.7.3",
+    "crypto-js": "^3.1.9-1",
+    "ejs": "^2.7.1",
+    "errorhandler": "^1.5.0",
+    "express": "^4.16.1",
+    "lodash": "^4.0.0",
+    "method-override": "^2.3.5",
+    "moment": "^2.24.0",
+    "mongodb": "^3.3.4",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "ripe": "^0.2.1"
+  }
+}
