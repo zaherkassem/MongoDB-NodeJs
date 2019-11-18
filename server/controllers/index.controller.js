@@ -3,8 +3,6 @@ let mongoDBLibrary = require('../api/data/db');
 let Router = require('express').Router;
 let router = new Router();
 
-
-
 function findAll() {
     console.log("findAll function");
     let filter = {};
@@ -16,13 +14,11 @@ function findAll() {
     });
 }
 
-
 router.get('/', function (req, res) {
     //findAll();
 });
 
 //deleteAll();
 findAll();
-
 
 module.exports = router;
