@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
@@ -8,7 +10,23 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'wix_google_calendar';
 const tblSource = "settings";
 const tblTarget = "settingsNew";
+const tblTarget2 = "settingsEnc";
 let DBCon = "";
+
+var secretKey = "zNtxb4YU3JUCxt2vBk9cjtyQjXvBEpjd"; //32 char
+var ivKey = secretKey.substr(0,16);// 16 char
+
+function encrypt(str) {
+    if(str == "") return str;
+    const encryptor = crypto.createCipheriv('AES-256-CBC', secretKey, ivKey);
+    return encryptor.update(str, 'utf8', 'base64') + encryptor.final('base64');
+}
+
+function decrypt(str) {
+    if(str == "") return str;
+    const decryptor = crypto.createDecipheriv('AES-256-CBC',secretKey, ivKey);
+    return decryptor.update(str, 'base64', 'utf8') + decryptor.final('utf8');
+}
 
 let mongoDBLibrary = {
     statusCodes: {
@@ -26,22 +44,37 @@ let mongoDBLibrary = {
             });
         });
     },
-    findAll: function (filter, callback) {
+    findAll: function (filter, limit,callback) {
         let that = this;
         return new Promise(function (resolve, reject) {
             MongoClient.connect(url,  { useUnifiedTopology: true } ,function (err, client) {
                 // Get the documents collection
                 let collection = client.db(dbName).collection(tblSource);
                 // Find some documents
-
-                collection.find(filter).limit(10000).toArray(function (err, docs) {
+                let index = 0 ;
+                collection.find(filter).limit(limit).toArray(function (err, docs) {
                     assert.equal(err, null);
                     docs.forEach(function(item) {
-                        console.log("item:", item.compId);
+                        index++;
+                        console.log('"compId":"', item.compId, '", "instanceId":"',  item.instanceId,'"');
+                        item.settings.accountDetails.clientId       = encrypt(item.settings.accountDetails.clientId);
+                        item.settings.accountDetails.emailAddress   = encrypt(item.settings.accountDetails.emailAddress);
+                        item.settings.accountDetails.accessToken    = encrypt(item.settings.accountDetails.accessToken);
+                        item.settings.accountDetails.refreshToken   = encrypt(item.settings.accountDetails.refreshToken);
+                        item.settings.accountDetails.selected_cal   = encrypt(item.settings.accountDetails.selected_cal);
+                        //var clientIdDecrypt  = decrypt(clientIdEncrypt);
+                        var itemId  = item._id;
+                        delete item._id;
+
+                        client.db(dbName).collection(tblTarget2).insertOne(item,{ignoreUndefined:true});
+                        collection.deleteOne({"_id":itemId});
+
+                        //console.log("clientIdEncrypt:", clientIdEncrypt);
+                        //console.log("clientIdDecrypt:", clientIdDecrypt);
                     });
                     client.close();
                     console.log("disconnect db server");
-                    callback(docs);
+                    callback(index);
                 });
             });
         }).catch(function (err) {
